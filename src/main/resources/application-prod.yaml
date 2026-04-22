@@ -77,6 +77,12 @@ app:
     refresh-token-expiry: ${JWT_REFRESH_EXPIRY:2592000000}
     issuer: railway-auth
 
+  email:
+    provider: ${EMAIL_PROVIDER}
+    resend:
+      api-key: ${RESEND_API_KEY}
+      from-address: ${RESEND_FROM_ADDRESS}
+
 logging:
   level:
     com.railway: INFO
