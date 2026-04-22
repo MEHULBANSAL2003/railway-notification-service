@@ -61,6 +61,7 @@ spring:
       properties:
         spring.json.add.type.headers: false
 app:
+  frontend-url: https://dev.railtick.in
   jwt:
     secret: ${JWT_SECRET}
     access-token-expiry: ${JWT_ACCESS_EXPIRY:900000}
