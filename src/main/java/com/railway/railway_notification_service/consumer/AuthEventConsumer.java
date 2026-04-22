@@ -1,4 +1,3 @@
-// src/main/java/com/railway/railway_notification_service/consumer/AuthEventConsumer.java
 package com.railway.railway_notification_service.consumer;
 
 import com.railway.common.event.auth.EmailVerificationReminderEvent;
@@ -9,6 +8,7 @@ import com.railway.railway_notification_service.model.EmailType;
 import com.railway.railway_notification_service.service.EmailService.EmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
@@ -30,19 +30,39 @@ public class AuthEventConsumer {
   public void handleEmailVerificationReminder(
     EmailVerificationReminderEvent event) {
 
-    log.info("📩 Received verification reminder userId={} email={}",
-      event.userId(), event.email());
+    // Restore correlationId from event onto this Kafka listener thread
+    // WHY: Kafka listener thread has empty MDC by default
+    // This makes all logs in this method traceable to the original request
+    String correlationId = event.correlationId();
+    if (correlationId != null) {
+      MDC.put("correlationId", correlationId);
+    } else {
+      // Fallback: generate fresh one if not present
+      // Handles events published before this change was deployed
+      MDC.put("correlationId", java.util.UUID.randomUUID().toString());
+    }
 
-    var request = EmailRequest.builder()
-      .to(event.email())
-      .subject("Please verify your RailTick email address")
-      .emailType(EmailType.EMAIL_VERIFICATION_REMINDER)
-      .templateModel(EmailTemplateModel.builder()
-        .recipientName(event.fullName())
-        .actionUrl(frontendUrl + "/profile")
-        .build())
-      .build();
+    try {
+      log.info("📩 Received verification reminder userId={} email={}",
+        event.userId(), event.email());
 
-    emailService.sendEmail(request);
+      var request = EmailRequest.builder()
+        .to(event.email())
+        .subject("Please verify your RailTick email address")
+        .emailType(EmailType.EMAIL_VERIFICATION_REMINDER)
+        .templateModel(EmailTemplateModel.builder()
+          .recipientName(event.fullName())
+          .actionUrl(frontendUrl + "/verify-email")
+          .build())
+        .build();
+
+      emailService.sendEmail(request);
+
+    } finally {
+      // WHY finally: Kafka reuses listener threads
+      // Must clean MDC after each message or correlationId
+      // bleeds into the next consumed message on same thread
+      MDC.clear();
+    }
   }
 }
