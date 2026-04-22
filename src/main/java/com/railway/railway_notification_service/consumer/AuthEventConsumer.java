@@ -39,7 +39,7 @@ public class AuthEventConsumer {
       .emailType(EmailType.EMAIL_VERIFICATION_REMINDER)
       .templateModel(EmailTemplateModel.builder()
         .recipientName(event.fullName())
-        .actionUrl(frontendUrl + "/verify-email")
+        .actionUrl(frontendUrl + "/profile")
         .build())
       .build();
 
