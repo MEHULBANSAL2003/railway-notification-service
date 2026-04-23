@@ -11,11 +11,9 @@ package com.railway.railway_notification_service.model;
  */
 public enum EmailType {
 
-  EMAIL_VERIFICATION_REMINDER("email-verification-reminder");
-  // Add more here as needed:
-  // WELCOME("welcome"),
-  // PASSWORD_CHANGED("password-changed"),
-  // BOOKING_CONFIRMED("booking-confirmed");
+  EMAIL_VERIFICATION_REMINDER("email-verification-reminder"),
+  ACCOUNT_DELETION_REQUEST("account-deletion-request"),
+  ACCOUNT_DELETE_PERMANENT("account-deletion-permanent");
 
   private final String templateName;
 
