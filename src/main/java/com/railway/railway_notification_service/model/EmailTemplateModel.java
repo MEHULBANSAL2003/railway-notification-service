@@ -22,6 +22,9 @@ public class EmailTemplateModel {
   // The button URL — verify page, reset page, etc.
   private final String actionUrl;
 
+  // Account deletion recovery period in days
+  private final Integer recoverPeriodDays;
+
   @Builder.Default
   private final String appName = "RailTick";
 
