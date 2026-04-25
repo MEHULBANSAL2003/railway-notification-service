@@ -35,6 +35,7 @@ public class EmailTemplateService {
     context.setVariable("appName", model.getAppName());
     context.setVariable("supportEmail", model.getSupportEmail());
     context.setVariable("currentYear", model.getCurrentYear());
+    context.setVariable("recoverPeriodDays", model.getRecoverPeriodDays());
 
     String templatePath = "email/" + emailType.getTemplateName();
     log.debug("Rendering template: {}", templatePath);
